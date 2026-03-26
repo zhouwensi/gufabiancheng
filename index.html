@@ -1,1416 +1,1031 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>古法编程 - 纯手工，无添加AI</title>
-    <meta name="description" content="在AI Coding时代，致敬纯手工编程这门即将失传的手艺。古法编程，人类非物质文化遗产。">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
-    <style>
-        /* ====== CSS Reset & Base ====== */
-        *, *::before, *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --color-bg: #f5f0e8;
-            --color-bg-dark: #e8e0d0;
-            --color-paper: #faf7f0;
-            --color-ink: #2c2416;
-            --color-ink-light: #5a4e3c;
-            --color-accent: #8b1a1a;
-            --color-accent-light: #c23a3a;
-            --color-gold: #b8860b;
-            --color-gold-light: #daa520;
-            --color-seal: #cc3333;
-            --color-code-bg: #2d2a24;
-            --color-code-text: #e8dcc8;
-            --font-serif: 'Noto Serif SC', 'Songti SC', 'SimSun', serif;
-            --font-sans: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            --font-display: 'ZCOOL KuaiLe', 'Noto Serif SC', cursive;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: var(--font-sans);
-            background-color: var(--color-bg);
-            color: var(--color-ink);
-            line-height: 1.8;
-            overflow-x: hidden;
-        }
-
-        /* ====== 纸张纹理背景 ====== */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* ====== 导航栏 ====== */
-        .nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(245, 240, 232, 0.92);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(139, 26, 26, 0.15);
-            z-index: 1000;
-            transition: all 0.3s ease;
-        }
-
-        .nav-inner {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0.6rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .nav-brand {
-            font-family: var(--font-serif);
-            font-weight: 900;
-            font-size: 1.3rem;
-            color: var(--color-accent);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-
-        .nav-brand .seal-mini {
-            display: inline-block;
-            width: 28px;
-            height: 28px;
-            background: var(--color-seal);
-            color: #fff;
-            font-size: 0.65rem;
-            font-family: var(--font-serif);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 3px;
-            transform: rotate(-5deg);
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 1.8rem;
-            list-style: none;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: var(--color-ink-light);
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: color 0.2s;
-            position: relative;
-        }
-
-        .nav-links a:hover {
-            color: var(--color-accent);
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--color-accent);
-            transition: width 0.3s ease;
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        /* Mobile nav toggle */
-        .nav-toggle {
-            display: none;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0.5rem;
-        }
-
-        .nav-toggle span {
-            display: block;
-            width: 24px;
-            height: 2px;
-            background: var(--color-ink);
-            margin: 5px 0;
-            transition: 0.3s;
-        }
-
-        /* ====== 首屏 Hero ====== */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 6rem 2rem 4rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .hero-badge {
-            display: inline-block;
-            border: 2px solid var(--color-accent);
-            color: var(--color-accent);
-            padding: 0.3rem 1.2rem;
-            font-size: 0.8rem;
-            font-family: var(--font-serif);
-            letter-spacing: 0.3em;
-            margin-bottom: 2rem;
-            position: relative;
-        }
-
-        .hero-badge::before,
-        .hero-badge::after {
-            content: '◆';
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 0.5rem;
-            color: var(--color-accent);
-        }
-
-        .hero-badge::before { left: -1rem; }
-        .hero-badge::after { right: -1rem; }
-
-        .hero-title {
-            font-family: var(--font-serif);
-            font-weight: 900;
-            font-size: clamp(3rem, 10vw, 7rem);
-            color: var(--color-ink);
-            line-height: 1.1;
-            margin-bottom: 0.5rem;
-            letter-spacing: 0.08em;
-            position: relative;
-        }
-
-        .hero-title .char-gu { color: var(--color-accent); }
-        .hero-title .char-fa { color: var(--color-accent); }
-
-        .hero-subtitle {
-            font-family: var(--font-serif);
-            font-size: clamp(1rem, 3vw, 1.5rem);
-            color: var(--color-ink-light);
-            font-weight: 400;
-            margin-bottom: 2.5rem;
-            letter-spacing: 0.15em;
-        }
-
-        .hero-slogan {
-            font-size: 1.1rem;
-            color: var(--color-ink-light);
-            font-weight: 300;
-            line-height: 2;
-            max-width: 500px;
-            margin-bottom: 3rem;
-        }
-
-        .hero-slogan em {
-            font-style: normal;
-            color: var(--color-accent);
-            font-weight: 500;
-        }
-
-        /* 印章 */
-        .seal {
-            width: 100px;
-            height: 100px;
-            border: 4px solid var(--color-seal);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: var(--font-serif);
-            font-size: 1.6rem;
-            font-weight: 900;
-            color: var(--color-seal);
-            transform: rotate(-12deg);
-            margin-bottom: 2rem;
-            position: relative;
-            line-height: 1.2;
-            text-align: center;
-            opacity: 0.85;
-        }
-
-        .seal::before {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            border: 2px solid var(--color-seal);
-            border-radius: 10px;
-            opacity: 0.4;
-        }
-
-        .hero-scroll {
-            position: absolute;
-            bottom: 2rem;
-            animation: float 2s ease-in-out infinite;
-            color: var(--color-ink-light);
-            font-size: 0.85rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-            text-decoration: none;
-        }
-
-        .hero-scroll .arrow {
-            font-size: 1.5rem;
-            line-height: 1;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(8px); }
-        }
-
-        /* ====== 通用 Section ====== */
-        section {
-            position: relative;
-            z-index: 1;
-            padding: 5rem 2rem;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 3.5rem;
-        }
-
-        .section-number {
-            font-family: var(--font-serif);
-            font-size: 0.85rem;
-            color: var(--color-gold);
-            letter-spacing: 0.3em;
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-
-        .section-title {
-            font-family: var(--font-serif);
-            font-size: clamp(1.8rem, 5vw, 2.8rem);
-            font-weight: 900;
-            color: var(--color-ink);
-            margin-bottom: 0.8rem;
-        }
-
-        .section-desc {
-            font-size: 1rem;
-            color: var(--color-ink-light);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* 分隔线 */
-        .divider {
-            text-align: center;
-            padding: 2rem 0;
-            color: var(--color-gold);
-            font-size: 1.2rem;
-            letter-spacing: 1em;
-            opacity: 0.5;
-        }
-
-        /* ====== 何为古法 ====== */
-        #what {
-            background: var(--color-paper);
-            border-top: 1px solid rgba(0,0,0,0.06);
-            border-bottom: 1px solid rgba(0,0,0,0.06);
-        }
-
-        .definition-card {
-            background: var(--color-bg);
-            border: 1px solid rgba(139, 26, 26, 0.12);
-            border-radius: 4px;
-            padding: 3rem;
-            max-width: 750px;
-            margin: 0 auto;
-            position: relative;
-        }
-
-        .definition-card::before {
-            content: '「';
-            position: absolute;
-            top: 1rem;
-            left: 1.5rem;
-            font-size: 3rem;
-            font-family: var(--font-serif);
-            color: var(--color-accent);
-            opacity: 0.2;
-        }
-
-        .definition-card::after {
-            content: '」';
-            position: absolute;
-            bottom: 0.5rem;
-            right: 1.5rem;
-            font-size: 3rem;
-            font-family: var(--font-serif);
-            color: var(--color-accent);
-            opacity: 0.2;
-        }
-
-        .definition-main {
-            font-family: var(--font-serif);
-            font-size: 1.2rem;
-            line-height: 2.2;
-            margin-bottom: 2rem;
-        }
-
-        .definition-main strong {
-            color: var(--color-accent);
-            font-weight: 700;
-        }
-
-        .definition-list {
-            list-style: none;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1rem;
-        }
-
-        .definition-list li {
-            padding: 0.8rem 1rem;
-            background: var(--color-paper);
-            border-left: 3px solid var(--color-gold);
-            font-size: 0.95rem;
-            border-radius: 0 4px 4px 0;
-        }
-
-        .definition-list li .def-icon {
-            margin-right: 0.5rem;
-        }
-
-        /* ====== 技艺图鉴 ====== */
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .skill-card {
-            background: var(--color-paper);
-            border: 1px solid rgba(0,0,0,0.06);
-            border-radius: 6px;
-            padding: 2rem 1.5rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .skill-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-            border-color: var(--color-accent);
-        }
-
-        .skill-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, transparent 50%, rgba(139,26,26,0.04) 50%);
-        }
-
-        .skill-icon {
-            font-size: 2.2rem;
-            margin-bottom: 0.8rem;
-            display: block;
-        }
-
-        .skill-name {
-            font-family: var(--font-serif);
-            font-size: 1.15rem;
-            font-weight: 700;
-            margin-bottom: 0.3rem;
-        }
-
-        .skill-danger {
-            display: inline-block;
-            font-size: 0.7rem;
-            padding: 0.15rem 0.5rem;
-            border-radius: 2px;
-            margin-bottom: 0.8rem;
-            font-weight: 500;
-        }
-
-        .danger-critical {
-            background: rgba(204, 51, 51, 0.1);
-            color: var(--color-accent);
-            border: 1px solid rgba(204, 51, 51, 0.2);
-        }
-
-        .danger-high {
-            background: rgba(218, 165, 32, 0.1);
-            color: var(--color-gold);
-            border: 1px solid rgba(218, 165, 32, 0.2);
-        }
-
-        .danger-medium {
-            background: rgba(90, 78, 60, 0.08);
-            color: var(--color-ink-light);
-            border: 1px solid rgba(90, 78, 60, 0.15);
-        }
-
-        .skill-desc {
-            font-size: 0.9rem;
-            color: var(--color-ink-light);
-            line-height: 1.7;
-        }
-
-        /* ====== 古今对照 ====== */
-        #compare {
-            background: var(--color-paper);
-            border-top: 1px solid rgba(0,0,0,0.06);
-            border-bottom: 1px solid rgba(0,0,0,0.06);
-        }
-
-        .compare-table-wrap {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .compare-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.95rem;
-            min-width: 650px;
-        }
-
-        .compare-table thead th {
-            font-family: var(--font-serif);
-            font-size: 1.05rem;
-            padding: 1rem 1.5rem;
-            text-align: left;
-            border-bottom: 2px solid var(--color-accent);
-        }
-
-        .compare-table thead th:first-child {
-            width: 25%;
-        }
-
-        .compare-table thead .col-ancient {
-            color: var(--color-accent);
-        }
-
-        .compare-table thead .col-modern {
-            color: var(--color-ink-light);
-        }
-
-        .compare-table tbody td {
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid rgba(0,0,0,0.06);
-            vertical-align: top;
-        }
-
-        .compare-table tbody tr:hover {
-            background: rgba(139, 26, 26, 0.02);
-        }
-
-        .compare-table .scene {
-            font-family: var(--font-serif);
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        .compare-table .verdict {
-            font-size: 0.85rem;
-            color: var(--color-gold);
-            font-style: italic;
-        }
-
-        /* ====== 修炼等级 ====== */
-        .levels-timeline {
-            position: relative;
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        .levels-timeline::before {
-            content: '';
-            position: absolute;
-            left: 30px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: linear-gradient(to bottom, var(--color-gold-light), var(--color-accent));
-        }
-
-        .level-item {
-            position: relative;
-            padding-left: 80px;
-            padding-bottom: 2.5rem;
-        }
-
-        .level-item:last-child {
-            padding-bottom: 0;
-        }
-
-        .level-marker {
-            position: absolute;
-            left: 12px;
-            top: 0;
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            border: 3px solid var(--color-gold);
-            background: var(--color-bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            z-index: 2;
-        }
-
-        .level-title {
-            font-family: var(--font-serif);
-            font-size: 1.25rem;
-            font-weight: 700;
-            margin-bottom: 0.3rem;
-        }
-
-        .level-subtitle {
-            font-size: 0.85rem;
-            color: var(--color-gold);
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        .level-desc {
-            font-size: 0.92rem;
-            color: var(--color-ink-light);
-            line-height: 1.8;
-        }
-
-        .level-desc code {
-            background: rgba(45, 42, 36, 0.08);
-            padding: 0.1em 0.4em;
-            border-radius: 3px;
-            font-size: 0.85em;
-            font-family: 'Courier New', monospace;
-        }
-
-        /* ====== 古法认证 ====== */
-        #cert {
-            background: var(--color-paper);
-            border-top: 1px solid rgba(0,0,0,0.06);
-            border-bottom: 1px solid rgba(0,0,0,0.06);
-        }
-
-        .checklist {
-            max-width: 650px;
-            margin: 0 auto;
-        }
-
-        .checklist-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-            padding: 1rem 0;
-            border-bottom: 1px dashed rgba(0,0,0,0.08);
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .checklist-item:last-child {
-            border-bottom: none;
-        }
-
-        .checklist-box {
-            width: 24px;
-            height: 24px;
-            min-width: 24px;
-            border: 2px solid var(--color-ink-light);
-            border-radius: 3px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-            margin-top: 0.15rem;
-        }
-
-        .checklist-item.checked .checklist-box {
-            background: var(--color-accent);
-            border-color: var(--color-accent);
-            color: #fff;
-        }
-
-        .checklist-text {
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-
-        .checklist-item.checked .checklist-text {
-            text-decoration: line-through;
-            opacity: 0.5;
-        }
-
-        .cert-result {
-            text-align: center;
-            margin-top: 2.5rem;
-            padding: 2rem;
-            background: var(--color-bg);
-            border-radius: 6px;
-            border: 1px solid rgba(0,0,0,0.06);
-        }
-
-        .cert-score {
-            font-family: var(--font-serif);
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--color-accent);
-        }
-
-        .cert-label {
-            font-size: 0.95rem;
-            color: var(--color-ink-light);
-            margin-top: 0.3rem;
-        }
-
-        .cert-title-result {
-            font-family: var(--font-serif);
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-top: 0.8rem;
-            color: var(--color-ink);
-        }
-
-        /* ====== 传承宣言 ====== */
-        .manifesto {
-            max-width: 700px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .manifesto-text {
-            font-family: var(--font-serif);
-            font-size: 1.15rem;
-            line-height: 2.4;
-            margin-bottom: 2rem;
-        }
-
-        .manifesto-text p {
-            margin-bottom: 1.5rem;
-        }
-
-        .manifesto-text .highlight {
-            color: var(--color-accent);
-            font-weight: 700;
-        }
-
-        .manifesto-signature {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 3rem;
-        }
-
-        .manifesto-seal {
-            width: 70px;
-            height: 70px;
-            border: 3px solid var(--color-seal);
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: var(--font-serif);
-            font-size: 1.1rem;
-            font-weight: 900;
-            color: var(--color-seal);
-            transform: rotate(-8deg);
-            opacity: 0.8;
-        }
-
-        .manifesto-author {
-            font-size: 0.9rem;
-            color: var(--color-ink-light);
-        }
-
-        /* ====== Footer ====== */
-        .footer {
-            position: relative;
-            z-index: 1;
-            text-align: center;
-            padding: 3rem 2rem;
-            border-top: 1px solid rgba(0,0,0,0.06);
-            font-size: 0.85rem;
-            color: var(--color-ink-light);
-        }
-
-        .footer a {
-            color: var(--color-accent);
-            text-decoration: none;
-        }
-
-        .footer a:hover {
-            text-decoration: underline;
-        }
-
-        .footer-tagline {
-            font-family: var(--font-serif);
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-            color: var(--color-ink);
-        }
-
-        /* ====== 动画 ====== */
-        .fade-in {
-            opacity: 0;
-            transform: translateY(25px);
-            transition: opacity 0.6s ease, transform 0.6s ease;
-        }
-
-        .fade-in.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* ====== 响应式 ====== */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                width: 100%;
-                background: rgba(245, 240, 232, 0.98);
-                flex-direction: column;
-                padding: 1rem 2rem;
-                gap: 1rem;
-                border-bottom: 1px solid rgba(0,0,0,0.08);
-            }
-
-            .nav-links.open {
-                display: flex;
-            }
-
-            .nav-toggle {
-                display: block;
-            }
-
-            .hero {
-                padding: 5rem 1.5rem 3rem;
-            }
-
-            .hero-title {
-                letter-spacing: 0.03em;
-            }
-
-            section {
-                padding: 3.5rem 1.2rem;
-            }
-
-            .definition-card {
-                padding: 2rem 1.5rem;
-            }
-
-            .skills-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .compare-table {
-                font-size: 0.85rem;
-            }
-
-            .levels-timeline::before {
-                left: 20px;
-            }
-
-            .level-item {
-                padding-left: 60px;
-            }
-
-            .level-marker {
-                left: 4px;
-                width: 34px;
-                height: 34px;
-            }
-        }
-
-        /* ====== Easter Egg: Konami Code ====== */
-        .easter-egg-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            color: #0f0;
-            font-family: 'Courier New', monospace;
-            font-size: 1.5rem;
-            text-align: center;
-            line-height: 2;
-            cursor: pointer;
-        }
-
-        .easter-egg-overlay.show {
-            display: flex;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>古法编程 | Artisanal Game Coding</title>
+<meta name="description" content="纯手工，无添加AI，每一帧都是手搓的。人类游戏编程非物质文化遗产保护项目。">
+<style>
+/* ══════════════════════════════════════
+   像素风基础
+   ══════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #0f0f23;
+  --bg2: #1a1a2e;
+  --green: #00ff41;
+  --cyan: #00ffff;
+  --yellow: #ffff00;
+  --red: #ff0040;
+  --orange: #ff8c00;
+  --white: #e0e0e0;
+  --gray: #666680;
+  --pixel-border: 4px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--white);
+  font-family: 'ZCOOL KuaiLe', 'Microsoft YaHei', sans-serif;
+  font-size: 18px;
+  line-height: 1.8;
+  overflow-x: hidden;
+}
+
+/* 像素字体只用于标题和特殊元素 */
+.pixel-font {
+  font-family: 'Press Start 2P', monospace;
+}
+
+/* ══════════════════════════════════════
+   扫描线 + CRT 效果
+   ══════════════════════════════════════ */
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ══════════════════════════════════════
+   星空背景
+   ══════════════════════════════════════ */
+
+.stars {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+.star {
+  position: absolute;
+  background: #fff;
+  width: 2px;
+  height: 2px;
+  animation: twinkle 3s infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* ══════════════════════════════════════
+   像素边框组件
+   ══════════════════════════════════════ */
+
+.pixel-box {
+  border: var(--pixel-border) solid var(--green);
+  background: var(--bg2);
+  padding: 24px;
+  position: relative;
+  image-rendering: pixelated;
+}
+
+/* 像素风格的角 */
+.pixel-box::before {
+  content: '◻';
+  position: absolute;
+  top: -12px;
+  left: -12px;
+  color: var(--green);
+  font-size: 12px;
+}
+
+.pixel-box::after {
+  content: '◻';
+  position: absolute;
+  bottom: -12px;
+  right: -12px;
+  color: var(--green);
+  font-size: 12px;
+}
+
+/* ══════════════════════════════════════
+   容器
+   ══════════════════════════════════════ */
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+section {
+  margin-bottom: 80px;
+}
+
+/* ══════════════════════════════════════
+   导航栏
+   ══════════════════════════════════════ */
+
+nav {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: rgba(15, 15, 35, 0.95);
+  border-bottom: 2px solid var(--green);
+  z-index: 1000;
+  padding: 12px 0;
+}
+
+nav .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+nav .logo {
+  color: var(--green);
+  font-size: 12px;
+  letter-spacing: 2px;
+}
+
+nav .nav-links {
+  display: flex;
+  gap: 20px;
+  list-style: none;
+  flex-wrap: wrap;
+}
+
+nav .nav-links a {
+  color: var(--gray);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+nav .nav-links a:hover {
+  color: var(--green);
+}
+
+/* ══════════════════════════════════════
+   Hero 区
+   ══════════════════════════════════════ */
+
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 120px 24px 80px;
+}
+
+.hero-title-cn {
+  font-size: 48px;
+  color: var(--green);
+  margin-bottom: 8px;
+  text-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+}
+
+.hero-title-en {
+  font-size: 14px;
+  color: var(--cyan);
+  letter-spacing: 4px;
+  margin-bottom: 40px;
+}
+
+.hero-slogan {
+  font-size: 22px;
+  color: var(--yellow);
+  margin-bottom: 16px;
+}
+
+.hero-sub {
+  font-size: 16px;
+  color: var(--gray);
+  max-width: 500px;
+  line-height: 2;
+}
+
+.hero-sub .line {
+  display: block;
+}
+
+/* 闪烁光标 */
+.cursor-blink::after {
+  content: '█';
+  animation: blink 1s step-end infinite;
+  color: var(--green);
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* HP 条 */
+.hp-bar {
+  margin-top: 48px;
+  text-align: left;
+  display: inline-block;
+}
+
+.hp-label {
+  font-size: 10px;
+  color: var(--green);
+  margin-bottom: 4px;
+}
+
+.hp-track {
+  width: 280px;
+  height: 16px;
+  border: 2px solid var(--green);
+  background: var(--bg);
+  position: relative;
+  image-rendering: pixelated;
+}
+
+.hp-fill {
+  height: 100%;
+  background: var(--red);
+  width: 12%;
+  transition: width 2s;
+}
+
+.hp-text {
+  font-size: 10px;
+  color: var(--gray);
+  margin-top: 4px;
+}
+
+/* ══════════════════════════════════════
+   章节标题
+   ══════════════════════════════════════ */
+
+.section-title {
+  font-size: 12px;
+  color: var(--cyan);
+  margin-bottom: 24px;
+  letter-spacing: 2px;
+  padding-bottom: 8px;
+  border-bottom: 2px dashed var(--cyan);
+  display: inline-block;
+}
+
+.section-title-cn {
+  font-size: 28px;
+  color: var(--green);
+  margin-bottom: 8px;
+}
+
+/* ══════════════════════════════════════
+   何为古法
+   ══════════════════════════════════════ */
+
+.skill-list {
+  list-style: none;
+}
+
+.skill-list li {
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(0, 255, 65, 0.1);
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.skill-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  width: 32px;
+  text-align: center;
+}
+
+.skill-name {
+  color: var(--green);
+  font-weight: bold;
+}
+
+.skill-desc {
+  color: var(--gray);
+  font-size: 15px;
+}
+
+/* ══════════════════════════════════════
+   濒危技艺表格
+   ══════════════════════════════════════ */
+
+.danger-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.danger-table th {
+  text-align: left;
+  color: var(--cyan);
+  font-size: 10px;
+  letter-spacing: 2px;
+  padding: 8px 12px;
+  border-bottom: 2px solid var(--cyan);
+}
+
+.danger-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.danger-table tr:hover {
+  background: rgba(0, 255, 65, 0.03);
+}
+
+.level-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 11px;
+  border: 1px solid;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+}
+
+.level-critical { color: var(--red); border-color: var(--red); }
+.level-endangered { color: var(--orange); border-color: var(--orange); }
+.level-vulnerable { color: var(--yellow); border-color: var(--yellow); }
+.level-near { color: var(--green); border-color: var(--green); }
+.level-extinct { color: var(--gray); border-color: var(--gray); text-decoration: line-through; }
+
+/* ══════════════════════════════════════
+   古法 vs 新法
+   ══════════════════════════════════════ */
+
+.vs-block {
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 2;
+  padding: 24px;
+  background: var(--bg);
+  border: 2px solid var(--green);
+  overflow-x: auto;
+}
+
+.vs-old {
+  color: var(--green);
+}
+
+.vs-new {
+  color: var(--gray);
+}
+
+.vs-divider {
+  color: var(--yellow);
+  margin: 16px 0;
+  letter-spacing: 4px;
+}
+
+/* ══════════════════════════════════════
+   修炼等级
+   ══════════════════════════════════════ */
+
+.level-list {
+  list-style: none;
+}
+
+.level-item {
+  display: flex;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  align-items: flex-start;
+}
+
+.level-badge {
+  flex-shrink: 0;
+  width: 56px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--green);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--green);
+}
+
+.level-name {
+  color: var(--yellow);
+  font-weight: bold;
+  font-size: 17px;
+}
+
+.level-desc {
+  color: var(--gray);
+  font-size: 14px;
+}
+
+/* ══════════════════════════════════════
+   古法游戏殿堂
+   ══════════════════════════════════════ */
+
+.hall-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hall-card {
+  border: 2px solid var(--yellow);
+  padding: 20px;
+  background: var(--bg2);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.hall-card:hover {
+  border-color: var(--green);
+  box-shadow: 0 0 20px rgba(0, 255, 65, 0.15);
+}
+
+.hall-game {
+  font-size: 20px;
+  color: var(--green);
+  margin-bottom: 4px;
+}
+
+.hall-year {
+  font-size: 10px;
+  color: var(--cyan);
+  letter-spacing: 2px;
+}
+
+.hall-author {
+  color: var(--yellow);
+  font-size: 14px;
+  margin: 8px 0;
+}
+
+.hall-reason {
+  color: var(--gray);
+  font-size: 15px;
+}
+
+/* ══════════════════════════════════════
+   传承宣言
+   ══════════════════════════════════════ */
+
+.manifesto {
+  text-align: center;
+  padding: 60px 24px;
+}
+
+.manifesto p {
+  margin-bottom: 20px;
+  font-size: 17px;
+  color: var(--gray);
+}
+
+.manifesto .highlight {
+  color: var(--yellow);
+  font-size: 22px;
+}
+
+.manifesto .final-words {
+  color: var(--green);
+  font-style: italic;
+  font-size: 16px;
+  margin-top: 40px;
+  line-height: 2.2;
+}
+
+/* ══════════════════════════════════════
+   贡献
+   ══════════════════════════════════════ */
+
+.contribute-box {
+  text-align: center;
+  padding: 40px 24px;
+}
+
+.contribute-box p {
+  margin-bottom: 16px;
+  color: var(--gray);
+}
+
+.btn-pixel {
+  display: inline-block;
+  padding: 12px 24px;
+  border: 3px solid var(--green);
+  color: var(--green);
+  text-decoration: none;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  transition: all 0.2s;
+  background: transparent;
+}
+
+.btn-pixel:hover {
+  background: var(--green);
+  color: var(--bg);
+  box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+}
+
+/* ══════════════════════════════════════
+   Footer
+   ══════════════════════════════════════ */
+
+footer {
+  text-align: center;
+  padding: 40px 24px 60px;
+  border-top: 1px solid rgba(0, 255, 65, 0.1);
+  color: var(--gray);
+  font-size: 13px;
+}
+
+footer .footer-line {
+  margin-bottom: 8px;
+}
+
+footer a {
+  color: var(--green);
+  text-decoration: none;
+}
+
+/* ══════════════════════════════════════
+   响应式
+   ══════════════════════════════════════ */
+
+@media (max-width: 600px) {
+  .hero-title-cn {
+    font-size: 32px;
+  }
+  .hero-title-en {
+    font-size: 10px;
+    letter-spacing: 2px;
+  }
+  .hero-slogan {
+    font-size: 18px;
+  }
+  .section-title-cn {
+    font-size: 22px;
+  }
+  .hp-track {
+    width: 200px;
+  }
+  nav .nav-links {
+    gap: 12px;
+  }
+  nav .nav-links a {
+    font-size: 12px;
+  }
+  .level-item {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+</style>
 </head>
 <body>
 
-    <!-- 导航 -->
-    <nav class="nav" id="nav">
-        <div class="nav-inner">
-            <a href="#" class="nav-brand">
-                <span class="seal-mini">古</span>
-                古法编程
-            </a>
-            <button class="nav-toggle" id="navToggle" aria-label="菜单">
-                <span></span><span></span><span></span>
-            </button>
-            <ul class="nav-links" id="navLinks">
-                <li><a href="#what">何为古法</a></li>
-                <li><a href="#skills">技艺图鉴</a></li>
-                <li><a href="#compare">古今对照</a></li>
-                <li><a href="#levels">修炼等级</a></li>
-                <li><a href="#cert">古法认证</a></li>
-                <li><a href="#manifesto">传承宣言</a></li>
-            </ul>
-        </div>
-    </nav>
+<!-- ★ 星空 -->
+<div class="stars" id="stars"></div>
 
-    <!-- 首屏 -->
-    <header class="hero" id="hero">
-        <div class="seal">古法<br>编程</div>
-        <div class="hero-badge">人类非物质文化遗产 · 编程类</div>
-        <h1 class="hero-title">
-            <span class="char-gu">古</span><span class="char-fa">法</span>编程
-        </h1>
-        <p class="hero-subtitle">The Art of Hand-Crafted Code</p>
-        <p class="hero-slogan">
-            在 AI 替你写完一切的时代<br>
-            我们选择<em>亲手敲下每一行代码</em><br>
-            <em>纯手工，无添加 AI</em>
-        </p>
-        <a href="#what" class="hero-scroll">
-            <span>向下探索</span>
-            <span class="arrow">↓</span>
-        </a>
-    </header>
+<!-- ★ 导航 -->
+<nav>
+  <div class="container">
+    <span class="logo pixel-font">古法编程</span>
+    <ul class="nav-links">
+      <li><a href="#what">何为古法</a></li>
+      <li><a href="#danger">濒危技艺</a></li>
+      <li><a href="#vs">古法vs新法</a></li>
+      <li><a href="#level">修炼等级</a></li>
+      <li><a href="#hall">殿堂</a></li>
+      <li><a href="#contribute">贡献</a></li>
+    </ul>
+  </div>
+</nav>
 
-    <div class="divider">◈ ◈ ◈</div>
+<!-- ★ Hero -->
+<section class="hero">
+  <div class="hero-title-cn">古法编程</div>
+  <div class="hero-title-en pixel-font">ARTISANAL GAME CODING</div>
+  <div class="hero-slogan">纯手工，无添加AI，每一帧都是手搓的。</div>
+  <div class="hero-sub">
+    <span class="line">在 AI 生成游戏的时代，</span>
+    <span class="line">我们还在一个像素一个像素地画，</span>
+    <span class="line">一行一行地写物理引擎，</span>
+    <span class="line cursor-blink">一帧一帧地调动画</span>
+  </div>
 
-    <!-- 何为古法 -->
-    <section id="what">
-        <div class="container">
-            <div class="section-header fade-in">
-                <span class="section-number">壹 · WHAT</span>
-                <h2 class="section-title">何为古法编程</h2>
-                <p class="section-desc">一种正在消失的、以人类双手和大脑为核心工具的编程方式</p>
-            </div>
-            <div class="definition-card fade-in">
-                <p class="definition-main">
-                    <strong>古法编程</strong>（<em>Artisanal Programming</em>），又称手工编程、人肉编码，是指程序员<strong>不借助 AI 代码生成工具</strong>，完全依靠自身对编程语言的理解、对文档的阅读、对 bug 的肉眼观察，以及对 Stack Overflow 的虔诚搜索，来完成软件开发全过程的一种<strong>传统技艺</strong>。
-                </p>
-                <p class="definition-main" style="font-size: 1rem; color: var(--color-ink-light);">
-                    该技艺主要包括但不限于以下实践：
-                </p>
-                <ul class="definition-list">
-                    <li><span class="def-icon">⌨️</span> 手动逐字输入代码，含标点符号</li>
-                    <li><span class="def-icon">🔍</span> 肉眼 debug，用 print 语句定位问题</li>
-                    <li><span class="def-icon">📖</span> 阅读官方文档而非询问 AI</li>
-                    <li><span class="def-icon">🧠</span> 在大脑中构建程序逻辑</li>
-                    <li><span class="def-icon">⚙️</span> 手动配置开发环境与部署流程</li>
-                    <li><span class="def-icon">🤝</span> 与同事进行人对人的 Code Review</li>
-                </ul>
-            </div>
-        </div>
-    </section>
-
-    <div class="divider">◈ ◈ ◈</div>
-
-    <!-- 技艺图鉴 -->
-    <section id="skills">
-        <div class="container">
-            <div class="section-header fade-in">
-                <span class="section-number">贰 · SKILLS</span>
-                <h2 class="section-title">濒危技艺图鉴</h2>
-                <p class="section-desc">这些曾经是每位程序员的基本功，如今正在成为"非遗"</p>
-            </div>
-            <div class="skills-grid">
-                <div class="skill-card fade-in">
-                    <span class="skill-icon">🖊️</span>
-                    <h3 class="skill-name">手写 for 循环</h3>
-                    <span class="skill-danger danger-critical">濒危程度：极高</span>
-                    <p class="skill-desc">从初始化到条件判断到步进，每一个分号都由人类亲手敲入。AI 时代后，此技能退化速度最快。</p>
-                </div>
-                <div class="skill-card fade-in">
-                    <span class="skill-icon">🐛</span>
-                    <h3 class="skill-name">肉眼 Debug</h3>
-                    <span class="skill-danger danger-critical">濒危程度：极高</span>
-                    <p class="skill-desc">在数百行代码中凭直觉和经验找到 bug 的位置。需要对代码有"手感"，讲究望、闻、问、切。</p>
-                </div>
-                <div class="skill-card fade-in">
-                    <span class="skill-icon">📟</span>
-                    <h3 class="skill-name">命令行操作</h3>
-                    <span class="skill-danger danger-high">濒危程度：高</span>
-                    <p class="skill-desc">不依赖 GUI，纯键盘操作终端。ls、cd、grep、awk、sed 信手拈来，管道符用得行云流水。</p>
-                </div>
-                <div class="skill-card fade-in">
-                    <span class="skill-icon">📝</span>
-                    <h3 class="skill-name">Vim/Emacs 编辑</h3>
-                    <span class="skill-danger danger-high">濒危程度：高</span>
-                    <p class="skill-desc">在没有智能补全的编辑器中自由编码。退出 Vim 曾是初级测试，如今连进入 Vim 的人都越来越少。</p>
-                </div>
-                <div class="skill-card fade-in">
-                    <span class="skill-icon">📋</span>
-                    <h3 class="skill-name">阅读官方文档</h3>
-                    <span class="skill-danger danger-critical">濒危程度：极高</span>
-                    <p class="skill-desc">直接阅读 RFC、man page、API 文档。不问 AI，不搜博客，从原始资料获取第一手知识。</p>
-                </div>
-                <div class="skill-card fade-in">
-                    <span class="skill-icon">🔧</span>
-                    <h3 class="skill-name">手写 Makefile</h3>
-                    <span class="skill-danger danger-medium">濒危程度：中</span>
-                    <p class="skill-desc">亲手编写编译规则，理解依赖关系和构建顺序。Tab 和空格的区别，是入门第一课。</p>
-                </div>
-                <div class="skill-card fade-in">
-                    <span class="skill-icon">🌿</span>
-                    <h3 class="skill-name">手动 Git 操作</h3>
-                    <span class="skill-danger danger-high">濒危程度：高</span>
-                    <p class="skill-desc">rebase、cherry-pick、reset --hard，每一步都了然于胸。解决 merge conflict 不靠 AI，靠阅读 diff。</p>
-                </div>
-                <div class="skill-card fade-in">
-                    <span class="skill-icon">🏗️</span>
-                    <h3 class="skill-name">手动部署上线</h3>
-                    <span class="skill-danger danger-medium">濒危程度：中</span>
-                    <p class="skill-desc">SSH 登录服务器，手动拉代码、编译、重启服务、看日志。凌晨三点的发布，是古法程序员的成人礼。</p>
-                </div>
-                <div class="skill-card fade-in">
-                    <span class="skill-icon">✍️</span>
-                    <h3 class="skill-name">手写正则表达式</h3>
-                    <span class="skill-danger danger-critical">濒危程度：极高</span>
-                    <p class="skill-desc">不借助任何工具，凭记忆写出正确的正则。此技能已被 WHO（World Hacker Organization）列为极度濒危。</p>
-                </div>
-                <div class="skill-card fade-in">
-                    <span class="skill-icon">🖥️</span>
-                    <h3 class="skill-name">手配 Nginx/Apache</h3>
-                    <span class="skill-danger danger-high">濒危程度：高</span>
-                    <p class="skill-desc">反向代理、负载均衡、SSL 证书，全部手写配置文件。每一个 location 块都是匠人的讲究。</p>
-                </div>
-                <div class="skill-card fade-in">
-                    <span class="skill-icon">🧮</span>
-                    <h3 class="skill-name">手推算法复杂度</h3>
-                    <span class="skill-danger danger-medium">濒危程度：中</span>
-                    <p class="skill-desc">在白板上用笔推导时间空间复杂度，画递归树，写状态转移方程。纸和笔，是最古老的 IDE。</p>
-                </div>
-                <div class="skill-card fade-in">
-                    <span class="skill-icon">💬</span>
-                    <h3 class="skill-name">写代码注释</h3>
-                    <span class="skill-danger danger-critical">濒危程度：极高</span>
-                    <p class="skill-desc">"AI 能读懂代码，为什么还要写注释？"——这句话标志着此技艺正式进入消亡倒计时。</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <div class="divider">◈ ◈ ◈</div>
-
-    <!-- 古今对照 -->
-    <section id="compare">
-        <div class="container">
-            <div class="section-header fade-in">
-                <span class="section-number">叁 · COMPARE</span>
-                <h2 class="section-title">古今对照</h2>
-                <p class="section-desc">两种编程方式的真实对比，各有千秋</p>
-            </div>
-            <div class="compare-table-wrap fade-in">
-                <table class="compare-table">
-                    <thead>
-                        <tr>
-                            <th>场景</th>
-                            <th class="col-ancient">🏺 古法</th>
-                            <th class="col-modern">🤖 新法</th>
-                            <th>点评</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="scene">写一个函数</td>
-                            <td>思考 10 分钟，敲 5 分钟</td>
-                            <td>描述需求 10 秒，AI 生成 1 秒</td>
-                            <td class="verdict">古法多了思考，也多了理解</td>
-                        </tr>
-                        <tr>
-                            <td class="scene">Debug</td>
-                            <td>加 print、读日志、冥想 2 小时</td>
-                            <td>把报错贴给 AI，2 秒出答案</td>
-                            <td class="verdict">古法虽慢，但你真懂了为什么错</td>
-                        </tr>
-                        <tr>
-                            <td class="scene">学新框架</td>
-                            <td>读文档、写 Demo、踩坑三天</td>
-                            <td>让 AI 直接生成项目脚手架</td>
-                            <td class="verdict">古法三天，顶新法三个月的理解深度</td>
-                        </tr>
-                        <tr>
-                            <td class="scene">配置环境</td>
-                            <td>手动装依赖，解决版本冲突半天</td>
-                            <td>"帮我配一下开发环境" → Done</td>
-                            <td class="verdict">古法练的是系统理解力</td>
-                        </tr>
-                        <tr>
-                            <td class="scene">写正则表达式</td>
-                            <td>对着文档，测试半小时</td>
-                            <td>描述匹配规则，AI 秒出</td>
-                            <td class="verdict">古法写完的成就感，无价</td>
-                        </tr>
-                        <tr>
-                            <td class="scene">Code Review</td>
-                            <td>逐行阅读，写详细评论</td>
-                            <td>AI 自动扫描，生成建议</td>
-                            <td class="verdict">古法 Review 是一种师徒传承</td>
-                        </tr>
-                        <tr>
-                            <td class="scene">上线部署</td>
-                            <td>SSH、手动操作、紧张出汗</td>
-                            <td>CI/CD 全自动，推代码即上线</td>
-                            <td class="verdict">古法凌晨发版的紧张感是一种仪式</td>
-                        </tr>
-                        <tr>
-                            <td class="scene">遇到不会的</td>
-                            <td>Google → Stack Overflow → 试错</td>
-                            <td>直接问 AI → 复制粘贴</td>
-                            <td class="verdict">古法练搜索，新法练提问</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </section>
-
-    <div class="divider">◈ ◈ ◈</div>
-
-    <!-- 修炼等级 -->
-    <section id="levels">
-        <div class="container">
-            <div class="section-header fade-in">
-                <span class="section-number">肆 · LEVELS</span>
-                <h2 class="section-title">修炼等级</h2>
-                <p class="section-desc">古法编程的修行之路，从入门到宗师</p>
-            </div>
-            <div class="levels-timeline">
-                <div class="level-item fade-in">
-                    <div class="level-marker">🥚</div>
-                    <h3 class="level-title">凡人</h3>
-                    <p class="level-subtitle">Level 0 · 尚未入门</p>
-                    <p class="level-desc">写 <code>Hello World</code> 需要问 AI，复制粘贴后不知道为什么能跑。认为"编程就是跟 AI 对话"。</p>
-                </div>
-                <div class="level-item fade-in">
-                    <div class="level-marker">🌱</div>
-                    <h3 class="level-title">入门</h3>
-                    <p class="level-subtitle">Level 1 · 初窥门径</p>
-                    <p class="level-desc">能不查资料写完一个 <code>for</code> 循环。知道 <code>=</code> 和 <code>==</code> 的区别。偶尔会手动打开终端输入命令。</p>
-                </div>
-                <div class="level-item fade-in">
-                    <div class="level-marker">⚔️</div>
-                    <h3 class="level-title">练气</h3>
-                    <p class="level-subtitle">Level 2 · 能独立存活</p>
-                    <p class="level-desc">能手写完整函数并一次编译通过。会用 <code>git add</code>、<code>git commit</code>、<code>git push</code> 三连。debug 时已经不完全依赖 AI。</p>
-                </div>
-                <div class="level-item fade-in">
-                    <div class="level-marker">🔥</div>
-                    <h3 class="level-title">筑基</h3>
-                    <p class="level-subtitle">Level 3 · 基础扎实</p>
-                    <p class="level-desc">能独立阅读报错信息并定位问题。手写 SQL 不会忘了 <code>WHERE</code> 子句。知道什么是 Big O，并且不只是面试时才想起来。</p>
-                </div>
-                <div class="level-item fade-in">
-                    <div class="level-marker">💫</div>
-                    <h3 class="level-title">金丹</h3>
-                    <p class="level-subtitle">Level 4 · 独当一面</p>
-                    <p class="level-desc">能不借助 AI 从零搭建一个完整项目。手写正则表达式成功率超过 50%。<code>git rebase -i</code> 运用自如。别人来问你问题，而不是 AI。</p>
-                </div>
-                <div class="level-item fade-in">
-                    <div class="level-marker">🐉</div>
-                    <h3 class="level-title">元婴</h3>
-                    <p class="level-subtitle">Level 5 · 高手境界</p>
-                    <p class="level-desc">能在 Vim 中高效编码且不想退出。手写 <code>Makefile</code> 和 <code>Dockerfile</code> 一气呵成。线上故障时，你是最后一道人肉防线。</p>
-                </div>
-                <div class="level-item fade-in">
-                    <div class="level-marker">🏔️</div>
-                    <h3 class="level-title">大乘</h3>
-                    <p class="level-subtitle">Level 6 · 近乎传说</p>
-                    <p class="level-desc">能手写编译器或操作系统内核的一部分。看汇编代码就能推断高级语言的逻辑。你不 Google 问题——问题 Google 你。</p>
-                </div>
-                <div class="level-item fade-in">
-                    <div class="level-marker">👑</div>
-                    <h3 class="level-title">宗师</h3>
-                    <p class="level-subtitle">Level MAX · 活的传说</p>
-                    <p class="level-desc">你就是文档本身。编程语言因你而修改规范。你的代码无需注释——因为后人会为你的代码写注释。据传全球仅存不超过十位。</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <div class="divider">◈ ◈ ◈</div>
-
-    <!-- 古法认证 -->
-    <section id="cert">
-        <div class="container">
-            <div class="section-header fade-in">
-                <span class="section-number">伍 · CERT</span>
-                <h2 class="section-title">古法编程师认证</h2>
-                <p class="section-desc">勾选你能做到的，看看你是不是一位合格的古法编程师</p>
-            </div>
-            <div class="checklist fade-in" id="checklist">
-                <div class="checklist-item" data-index="0">
-                    <div class="checklist-box"></div>
-                    <span class="checklist-text">我能不借助 AI/自动补全，手写一个完整的函数</span>
-                </div>
-                <div class="checklist-item" data-index="1">
-                    <div class="checklist-box"></div>
-                    <span class="checklist-text">我看到报错信息，第一反应是自己读而不是丢给 AI</span>
-                </div>
-                <div class="checklist-item" data-index="2">
-                    <div class="checklist-box"></div>
-                    <span class="checklist-text">我知道如何退出 Vim</span>
-                </div>
-                <div class="checklist-item" data-index="3">
-                    <div class="checklist-box"></div>
-                    <span class="checklist-text">我曾手动用 SSH 登录服务器部署过项目</span>
-                </div>
-                <div class="checklist-item" data-index="4">
-                    <div class="checklist-box"></div>
-                    <span class="checklist-text">我能不查文档写出至少 3 个 git 命令</span>
-                </div>
-                <div class="checklist-item" data-index="5">
-                    <div class="checklist-box"></div>
-                    <span class="checklist-text">我曾阅读过某个工具/语言的官方文档超过 30 分钟</span>
-                </div>
-                <div class="checklist-item" data-index="6">
-                    <div class="checklist-box"></div>
-                    <span class="checklist-text">我能在白板/纸上写出能运行的代码（不算语法小错）</span>
-                </div>
-                <div class="checklist-item" data-index="7">
-                    <div class="checklist-box"></div>
-                    <span class="checklist-text">我曾用 <code>console.log</code> / <code>print</code> 成功定位过一个 bug</span>
-                </div>
-                <div class="checklist-item" data-index="8">
-                    <div class="checklist-box"></div>
-                    <span class="checklist-text">我手动解决过 git merge conflict（不是点"Accept Both"）</span>
-                </div>
-                <div class="checklist-item" data-index="9">
-                    <div class="checklist-box"></div>
-                    <span class="checklist-text">我能手写一段正则表达式并且它能正确工作</span>
-                </div>
-                <div class="checklist-item" data-index="10">
-                    <div class="checklist-box"></div>
-                    <span class="checklist-text">我曾在没有网络的情况下依然能写代码</span>
-                </div>
-                <div class="checklist-item" data-index="11">
-                    <div class="checklist-box"></div>
-                    <span class="checklist-text">我主动写过代码注释（不是 AI 自动生成的那种）</span>
-                </div>
-            </div>
-            <div class="cert-result fade-in" id="certResult">
-                <div class="cert-score" id="certScore">0 / 12</div>
-                <div class="cert-label">项古法技艺达标</div>
-                <div class="cert-title-result" id="certTitle">请开始勾选以获取您的认证等级</div>
-            </div>
-        </div>
-    </section>
-
-    <div class="divider">◈ ◈ ◈</div>
-
-    <!-- 传承宣言 -->
-    <section id="manifesto">
-        <div class="container">
-            <div class="section-header fade-in">
-                <span class="section-number">陆 · MANIFESTO</span>
-                <h2 class="section-title">传承宣言</h2>
-            </div>
-            <div class="manifesto fade-in">
-                <div class="manifesto-text">
-                    <p>
-                        我们并不反对 AI。<br>
-                        AI 是好工具，正如电锯是好工具。<br>
-                        但木匠不会因为电锯的存在，就忘记<span class="highlight">手锯的纹理</span>。
-                    </p>
-                    <p>
-                        古法编程不是守旧，而是<span class="highlight">根基</span>。<br>
-                        是你在 AI 给出错误答案时，能识别出来的能力。<br>
-                        是你在网络断开时，依然能写代码的底气。<br>
-                        是你理解"为什么"而不只是"怎么做"的那份<span class="highlight">深度</span>。
-                    </p>
-                    <p>
-                        也许有一天，手写代码会像书法一样，<br>
-                        不再是生存技能，而成为一种<span class="highlight">修行</span>。<br>
-                        但正因如此，它才更值得被记住。
-                    </p>
-                    <p>
-                        我们记录它，不是因为它即将消亡，<br>
-                        而是因为<span class="highlight">它值得被铭记</span>。
-                    </p>
-                </div>
-                <div class="manifesto-signature">
-                    <div class="manifesto-seal">传承</div>
-                    <p class="manifesto-author">
-                        古法编程保护协会<br>
-                        <a href="https://github.com/zhouwensi/gufabiancheng" target="_blank" rel="noopener">github.com/zhouwensi/gufabiancheng</a>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <p class="footer-tagline">「 凡有代码处，皆有手工痕 」</p>
-        <p>此页面由人类手工编写 · 未使用任何 AI 代码生成工具 *</p>
-        <p style="font-size: 0.75rem; margin-top: 0.5rem; opacity: 0.5;">* 好吧也许用了一点点，但精神上是古法的</p>
-        <p style="margin-top: 1rem;">
-            <a href="https://github.com/zhouwensi/gufabiancheng" target="_blank" rel="noopener">GitHub</a>
-            &nbsp;·&nbsp; 
-            © 2024-2026 古法编程保护协会
-        </p>
-    </footer>
-
-    <!-- 彩蛋 -->
-    <div class="easter-egg-overlay" id="easterEgg">
-        <div>
-            > ANCIENT CODING MODE ACTIVATED<br>
-            > WELCOME, TRUE PROGRAMMER<br>
-            > MAY YOUR BRACKETS ALWAYS MATCH<br><br>
-            <span style="font-size: 0.9rem; opacity: 0.6;">（点击任意处关闭）</span>
-        </div>
+  <div class="hp-bar">
+    <div class="hp-label pixel-font">HAND-CODING SKILL</div>
+    <div class="hp-track">
+      <div class="hp-fill" id="hpFill"></div>
     </div>
+    <div class="hp-text pixel-font">12 / 100  — 全球手写代码率（预估）</div>
+  </div>
+</section>
 
-    <script>
-        // ====== 移动端导航 ======
-        const navToggle = document.getElementById('navToggle');
-        const navLinks = document.getElementById('navLinks');
+<!-- ★ 何为古法游戏编程 -->
+<section id="what">
+  <div class="container">
+    <div class="section-title-cn">何为古法游戏编程</div>
+    <div class="section-title pixel-font">WHAT IS THIS</div>
+    <div class="pixel-box">
+      <p style="margin-bottom: 20px; color: var(--gray);">
+        古法游戏编程，指不借助 AI 辅助工具，由人类程序员凭借自身技艺，
+        亲手完成游戏开发中全部或部分工作的编程方式。
+      </p>
+      <ul class="skill-list">
+        <li>
+          <span class="skill-icon">✍️</span>
+          <div>
+            <div class="skill-name">手写游戏引擎</div>
+            <div class="skill-desc">不用 Unity / Unreal，从 main() 开始搭</div>
+          </div>
+        </li>
+        <li>
+          <span class="skill-icon">🎨</span>
+          <div>
+            <div class="skill-name">手绘像素美术</div>
+            <div class="skill-desc">一个像素一个像素地点，不用 AI 生图</div>
+          </div>
+        </li>
+        <li>
+          <span class="skill-icon">🐛</span>
+          <div>
+            <div class="skill-name">手动调物理</div>
+            <div class="skill-desc">自己写碰撞检测，自己算抛物线</div>
+          </div>
+        </li>
+        <li>
+          <span class="skill-icon">🎵</span>
+          <div>
+            <div class="skill-name">手编音效</div>
+            <div class="skill-desc">用波形编辑器手搓 chiptune 音乐</div>
+          </div>
+        </li>
+        <li>
+          <span class="skill-icon">📐</span>
+          <div>
+            <div class="skill-name">手算数学</div>
+            <div class="skill-desc">矩阵变换、四元数旋转，纸上先推一遍再写代码</div>
+          </div>
+        </li>
+        <li>
+          <span class="skill-icon">🔧</span>
+          <div>
+            <div class="skill-name">手配环境</div>
+            <div class="skill-desc">自己编译工具链、写 Makefile、配交叉编译</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
 
-        navToggle.addEventListener('click', () => {
-            navLinks.classList.toggle('open');
-        });
+<!-- ★ 濒危技艺 -->
+<section id="danger">
+  <div class="container">
+    <div class="section-title-cn">濒危技艺一览</div>
+    <div class="section-title pixel-font">ENDANGERED SKILLS</div>
+    <div class="pixel-box" style="overflow-x: auto;">
+      <table class="danger-table">
+        <thead>
+          <tr>
+            <th>SKILL</th>
+            <th>LEVEL</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>手写软件渲染器（不用 GPU）</td>
+            <td><span class="level-tag level-critical">CRITICAL</span></td>
+          </tr>
+          <tr>
+            <td>手搓碰撞检测（SAT / GJK）</td>
+            <td><span class="level-tag level-critical">CRITICAL</span></td>
+          </tr>
+          <tr>
+            <td>手写 ECS 架构</td>
+            <td><span class="level-tag level-critical">CRITICAL</span></td>
+          </tr>
+          <tr>
+            <td>手写网络同步（帧同步 / 状态同步）</td>
+            <td><span class="level-tag level-endangered">ENDANGERED</span></td>
+          </tr>
+          <tr>
+            <td>手绘逐帧动画（sprite sheet）</td>
+            <td><span class="level-tag level-endangered">ENDANGERED</span></td>
+          </tr>
+          <tr>
+            <td>手写着色器（不用节点编辑器）</td>
+            <td><span class="level-tag level-vulnerable">VULNERABLE</span></td>
+          </tr>
+          <tr>
+            <td>手配关卡（不用 AI 生成地形）</td>
+            <td><span class="level-tag level-vulnerable">VULNERABLE</span></td>
+          </tr>
+          <tr>
+            <td>手写 A* 寻路</td>
+            <td><span class="level-tag level-near">NEAR THREATENED</span></td>
+          </tr>
+          <tr>
+            <td>手动优化 Draw Call</td>
+            <td><span class="level-tag level-near">NEAR THREATENED</span></td>
+          </tr>
+          <tr>
+            <td>用记事本写 shader</td>
+            <td><span class="level-tag level-extinct">EXTINCT</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
 
-        // 点击导航链接后关闭菜单
-        navLinks.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                navLinks.classList.remove('open');
-            });
-        });
+<!-- ★ 古法 vs 新法 -->
+<section id="vs">
+  <div class="container">
+    <div class="section-title-cn">古法 vs 新法</div>
+    <div class="section-title pixel-font">OLD WAY vs NEW WAY</div>
+    <div class="vs-block">
+      <div class="vs-old">
+&gt; 古法做游戏：<br>
+&nbsp;&nbsp;想做一个平台跳跃<br>
+&nbsp;&nbsp;→ 手写物理引擎<br>
+&nbsp;&nbsp;→ 手绘角色<br>
+&nbsp;&nbsp;→ 手调手感<br>
+&nbsp;&nbsp;→ 反复试玩三个月<br>
+&nbsp;&nbsp;→ 三年后发布<br>
+&nbsp;&nbsp;→ 玩家说 "手感真好"<br>
+&nbsp;&nbsp;→ <span style="color: var(--yellow);">值了</span>
+      </div>
+      <div class="vs-divider">════════════════════════</div>
+      <div class="vs-new">
+&gt; 新法做游戏：<br>
+&nbsp;&nbsp;想做一个平台跳跃<br>
+&nbsp;&nbsp;→ 告诉 AI "帮我做个马里奥"<br>
+&nbsp;&nbsp;→ 30 秒生成<br>
+&nbsp;&nbsp;→ 发布<br>
+&nbsp;&nbsp;→ 玩家说 "这 AI 做的吧"<br>
+&nbsp;&nbsp;→ <span style="color: var(--gray);">确实</span>
+      </div>
+    </div>
+    <p style="margin-top: 16px; color: var(--gray); font-size: 14px; text-align: center;">
+      两条路都能到终点，但走过的路不同。
+    </p>
+  </div>
+</section>
 
-        // ====== 滚动动画 ======
-        const fadeEls = document.querySelectorAll('.fade-in');
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        });
+<!-- ★ 修炼等级 -->
+<section id="level">
+  <div class="container">
+    <div class="section-title-cn">修炼等级</div>
+    <div class="section-title pixel-font">SKILL TREE</div>
+    <div class="pixel-box">
+      <ul class="level-list">
+        <li class="level-item">
+          <span class="level-badge">LV.0</span>
+          <div>
+            <div class="level-name">NPC</div>
+            <div class="level-desc">用 AI 生成整个游戏，自己只写 prompt</div>
+          </div>
+        </li>
+        <li class="level-item">
+          <span class="level-badge">LV.1</span>
+          <div>
+            <div class="level-name">新手村</div>
+            <div class="level-desc">能关掉 Copilot 写完一个 game loop</div>
+          </div>
+        </li>
+        <li class="level-item">
+          <span class="level-badge">LV.2</span>
+          <div>
+            <div class="level-name">冒险者</div>
+            <div class="level-desc">能手写 2D 碰撞检测</div>
+          </div>
+        </li>
+        <li class="level-item">
+          <span class="level-badge">LV.3</span>
+          <div>
+            <div class="level-name">精英怪</div>
+            <div class="level-desc">能不用引擎做出一个可玩的游戏</div>
+          </div>
+        </li>
+        <li class="level-item">
+          <span class="level-badge">LV.4</span>
+          <div>
+            <div class="level-name">Boss</div>
+            <div class="level-desc">能手写软件光栅化渲染器</div>
+          </div>
+        </li>
+        <li class="level-item">
+          <span class="level-badge">LV.5</span>
+          <div>
+            <div class="level-name">隐藏 Boss</div>
+            <div class="level-desc">能手写一套完整的游戏引擎</div>
+          </div>
+        </li>
+        <li class="level-item">
+          <span class="level-badge">LV.6</span>
+          <div>
+            <div class="level-name">开发者房间</div>
+            <div class="level-desc">能在面试白板上手写四叉树碰撞优化</div>
+          </div>
+        </li>
+        <li class="level-item">
+          <span class="level-badge">LV.7</span>
+          <div>
+            <div class="level-name">通关</div>
+            <div class="level-desc">已退休，只在梦里改 bug</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
 
-        fadeEls.forEach(el => observer.observe(el));
+<!-- ★ 古法游戏殿堂 -->
+<section id="hall">
+  <div class="container">
+    <div class="section-title-cn">古法游戏殿堂</div>
+    <div class="section-title pixel-font">HALL OF FAME</div>
+    <p style="color: var(--gray); margin-bottom: 24px;">
+      致敬那些纯手工时代的传世之作。每一行代码都是人类亲手写下的。
+    </p>
+    <div class="hall-grid">
 
-        // ====== 认证 Checklist ======
-        const checklistItems = document.querySelectorAll('.checklist-item');
-        const certScore = document.getElementById('certScore');
-        const certTitle = document.getElementById('certTitle');
+      <div class="hall-card">
+        <div class="hall-game">Roller Coaster Tycoon</div>
+        <div class="hall-year pixel-font">1999</div>
+        <div class="hall-author">Chris Sawyer</div>
+        <div class="hall-reason">99% 用汇编语言手写。一个人。汇编。整个游戏。</div>
+      </div>
 
-        const certTitles = {
-            0: '请开始勾选以获取您的认证等级',
-            1: '🥚 凡人 — 古法之路刚刚开始',
-            2: '🌱 入门弟子 — 初窥古法门径',
-            3: '🌱 入门弟子 — 有古法编程的潜质',
-            4: '⚔️ 练气修士 — 古法技艺初成',
-            5: '⚔️ 练气修士 — 古法功底逐渐扎实',
-            6: '🔥 筑基高手 — 可独立进行古法编程',
-            7: '🔥 筑基高手 — 古法技艺已成体系',
-            8: '💫 金丹长老 — 古法编程的中流砥柱',
-            9: '💫 金丹长老 — 离宗师仅有数步之遥',
-            10: '🐉 元婴大能 — 古法编程的活化石',
-            11: '🏔️ 大乘真人 — 人间罕见的古法传承者',
-            12: '👑 古法宗师 — 您就是古法编程本身'
-        };
+      <div class="hall-card">
+        <div class="hall-game">DOOM</div>
+        <div class="hall-year pixel-font">1993</div>
+        <div class="hall-author">id Software · John Carmack</div>
+        <div class="hall-reason">卡马克手写 BSP 渲染引擎，在没有 GPU 的年代跑出了 3D。</div>
+      </div>
 
-        checklistItems.forEach(item => {
-            item.addEventListener('click', () => {
-                item.classList.toggle('checked');
-                const box = item.querySelector('.checklist-box');
-                box.textContent = item.classList.contains('checked') ? '✓' : '';
-                updateScore();
-            });
-        });
+      <div class="hall-card">
+        <div class="hall-game">Cave Story 洞窟物语</div>
+        <div class="hall-year pixel-font">2004</div>
+        <div class="hall-author">天谷大辅（Pixel）</div>
+        <div class="hall-reason">一个人手搓 5 年。代码、美术、音乐、关卡设计全部一人完成。</div>
+      </div>
 
-        function updateScore() {
-            const count = document.querySelectorAll('.checklist-item.checked').length;
-            certScore.textContent = count + ' / 12';
-            certTitle.textContent = certTitles[count] || '';
-        }
+      <div class="hall-card">
+        <div class="hall-game">Undertale</div>
+        <div class="hall-year pixel-font">2015</div>
+        <div class="hall-author">Toby Fox</div>
+        <div class="hall-reason">GameMaker + 一人军团，手绘每一个角色，手写每一段对话。</div>
+      </div>
 
-        // ====== Konami Code 彩蛋 ======
-        const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
-        let konamiIndex = 0;
+      <div class="hall-card">
+        <div class="hall-game">Celeste</div>
+        <div class="hall-year pixel-font">2018</div>
+        <div class="hall-author">Matt Thorson &amp; Noel Berry</div>
+        <div class="hall-reason">手调到每一帧的平台跳跃手感。被业界视为"手感"的教科书。</div>
+      </div>
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === konamiCode[konamiIndex]) {
-                konamiIndex++;
-                if (konamiIndex === konamiCode.length) {
-                    document.getElementById('easterEgg').classList.add('show');
-                    konamiIndex = 0;
-                }
-            } else {
-                konamiIndex = 0;
-            }
-        });
+      <div class="hall-card">
+        <div class="hall-game">Stardew Valley</div>
+        <div class="hall-year pixel-font">2016</div>
+        <div class="hall-author">ConcernedApe (Eric Barone)</div>
+        <div class="hall-reason">一个人做了 4 年。代码、像素画、音乐、剧情全部手工。</div>
+      </div>
 
-        document.getElementById('easterEgg').addEventListener('click', () => {
-            document.getElementById('easterEgg').classList.remove('show');
-        });
+    </div>
+  </div>
+</section>
 
-        // ====== 导航滚动效果 ======
-        let lastScroll = 0;
-        const nav = document.getElementById('nav');
+<!-- ★ 传承宣言 -->
+<section>
+  <div class="container">
+    <div class="manifesto">
+      <p>我们不反对 AI，我们只是觉得——</p>
+      <p class="highlight">游戏是手感的艺术，而手感来自手工。</p>
+      <p>
+        当有一天 AI 全面接管游戏开发，<br>
+        当"手写代码"变成一种复古爱好，<br>
+        希望这个页面能让后人知道：
+      </p>
+      <p class="final-words">
+        曾经有一群人，<br>
+        是一个像素一个像素地画，<br>
+        一行一行地写物理引擎，<br>
+        一帧一帧地调动画，<br>
+        把那些美好的游戏世界，亲手搓出来的。
+      </p>
+    </div>
+  </div>
+</section>
 
-        window.addEventListener('scroll', () => {
-            const currentScroll = window.pageYOffset;
-            if (currentScroll > 100) {
-                nav.style.boxShadow = '0 2px 20px rgba(0,0,0,0.08)';
-            } else {
-                nav.style.boxShadow = 'none';
-            }
-            lastScroll = currentScroll;
-        });
-    </script>
+<!-- ★ 贡献 -->
+<section id="contribute">
+  <div class="container">
+    <div class="contribute-box pixel-box">
+      <div class="section-title-cn">加入传承</div>
+      <div class="section-title pixel-font" style="margin-bottom: 20px;">CONTRIBUTE</div>
+      <p>欢迎提交你知道的<span style="color: var(--yellow);">濒危游戏编程技艺</span>，</p>
+      <p>或者分享你的<span style="color: var(--green);">古法游戏开发故事</span>。</p>
+      <p style="margin-bottom: 24px;">请<span style="color: var(--red);">手动</span>提交。</p>
+      <a href="https://github.com/zhouwensi/artisanalcoding/issues" class="btn-pixel" target="_blank">
+        &gt; SUBMIT ISSUE &lt;
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ★ Footer -->
+<footer>
+  <div class="footer-line">古法编程 · Artisanal Game Coding</div>
+  <div class="footer-line">人类游戏编程非物质文化遗产保护项目</div>
+  <div class="footer-line" style="margin-top: 12px;">
+    <a href="https://github.com/zhouwensi/artisanalcoding" target="_blank">GitHub</a>
+    &nbsp;&nbsp;·&nbsp;&nbsp;
+    <a href="https://artisanalcoding.com">artisanalcoding.com</a>
+  </div>
+  <div class="footer-line" style="margin-top: 12px; font-size: 11px;">
+    © 2025 - ∞ &nbsp;|&nbsp; 纯手工打造，无 AI 添加*
+  </div>
+  <div class="footer-line" style="font-size: 10px; color: #444;">
+    * 好吧，这个页面确实问 AI 要的。但至少我们有这个意识。
+  </div>
+</footer>
+
+<script>
+// ═══ 星空生成 ═══
+(function() {
+  const container = document.getElementById('stars');
+  const count = 80;
+  for (let i = 0; i < count; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.animationDelay = Math.random() * 3 + 's';
+    star.style.animationDuration = (2 + Math.random() * 3) + 's';
+    if (Math.random() > 0.7) {
+      star.style.width = '3px';
+      star.style.height = '3px';
+    }
+    container.appendChild(star);
+  }
+})();
+
+// ═══ HP 条动画 ═══
+window.addEventListener('load', function() {
+  setTimeout(function() {
+    document.getElementById('hpFill').style.width = '12%';
+  }, 500);
+});
+
+// ═══ 导航高亮 ═══
+(function() {
+  const links = document.querySelectorAll('nav a');
+  const sections = document.querySelectorAll('section[id]');
+
+  window.addEventListener('scroll', function() {
+    let current = '';
+    sections.forEach(function(section) {
+      const top = section.offsetTop - 100;
+      if (window.scrollY >= top) {
+        current = section.getAttribute('id');
+      }
+    });
+    links.forEach(function(link) {
+      link.style.color = '';
+      if (link.getAttribute('href') === '#' + current) {
+        link.style.color = 'var(--green)';
+      }
+    });
+  });
+})();
+</script>
 </body>
 </html>
