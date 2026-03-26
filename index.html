@@ -551,6 +551,76 @@ nav .nav-links a:hover {
   box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
 }
 
+/* ═══ 公众号模块 ═══ */
+.wechat-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 60px;
+  margin-top: 40px;
+  padding: 40px;
+  border: var(--pixel-border) solid var(--green);
+  background: var(--bg2);
+  image-rendering: pixelated;
+  flex-wrap: wrap;
+}
+
+.qr-img {
+  width: 200px;
+  height: 200px;
+  border: var(--pixel-border) solid var(--cyan);
+  image-rendering: pixelated;
+  /* 像素风格的二维码边框动画 */
+  animation: qr-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes qr-glow {
+  from { box-shadow: 0 0 10px rgba(0, 255, 65, 0.3); }
+  to   { box-shadow: 0 0 25px rgba(0, 255, 65, 0.7); }
+}
+
+.wechat-info {
+  text-align: left;
+}
+
+.wechat-title {
+  font-size: 14px;
+  color: var(--green);
+  margin-bottom: 15px;
+}
+
+.wechat-name {
+  font-size: 22px;
+  margin-bottom: 20px;
+  color: var(--white);
+}
+
+.wechat-desc p {
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: var(--gray);
+}
+
+.wechat-desc p::before {
+  margin-right: 8px;
+}
+
+/* 手机端适配 */
+@media (max-width: 768px) {
+  .wechat-box {
+    flex-direction: column;
+    gap: 30px;
+    padding: 20px;
+  }
+  .wechat-info {
+    text-align: center;
+  }
+  .qr-img {
+    width: 160px;
+    height: 160px;
+  }
+}
+
 /* ══════════════════════════════════════
    Footer
    ══════════════════════════════════════ */
@@ -957,6 +1027,30 @@ footer a {
       <a href="https://github.com/zhouwensi/artisanalcoding/issues" class="btn-pixel" target="_blank">
         &gt; SUBMIT ISSUE &lt;
       </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 公众号 ═══ -->
+<section id="wechat" class="section">
+  <div class="container">
+    <h2 class="section-title pixel-font" style="color: var(--green);">
+      <span style="color: var(--cyan);">📡</span> 加入修炼
+    </h2>
+    <div class="wechat-box">
+      <div class="wechat-qr">
+        <img src="images/qrcode.png" alt="微信公众号二维码" class="qr-img">
+      </div>
+      <div class="wechat-info">
+        <p class="wechat-title pixel-font">关注公众号</p>
+        <p class="wechat-name">微信搜一搜：<span style="color: var(--yellow);">「游戏开发技术教程」</span></p>
+        <div class="wechat-desc">
+          <p>🎮 手搓游戏开发教程</p>
+          <p>🛠️ 古法编程技巧分享</p>
+          <p>📖 独立游戏开发故事</p>
+          <p>🏆 濒危技艺抢救行动</p>
+        </div>
+      </div>
     </div>
   </div>
 </section>
