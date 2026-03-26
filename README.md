@@ -40,5 +40,5 @@
 
 <p align="center">
   <sub>古法编程 · 纯手工，无添加 AI，每一帧都是手搓的</sub><br>
-  <sub>© 2025 - ∞</sub>
+  <sub>© 2026 - ∞</sub>
 </p>
