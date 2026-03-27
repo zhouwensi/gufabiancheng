@@ -621,6 +621,291 @@ nav .nav-links a:hover {
   }
 }
 
+   /* ═══════════════════════════════════════════════════════════ */
+/*                    星空修炼场                               */
+/* ═══════════════════════════════════════════════════════════ */
+
+#starfield {
+  position: relative;
+  overflow: hidden;
+}
+
+.starfield-subtitle {
+  text-align: center;
+  color: #8b949e;
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+}
+
+.starfield-hint {
+  text-align: center;
+  color: #555;
+  font-size: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ── 星空画布 ── */
+#star-canvas {
+  position: relative;
+  width: 100%;
+  height: 420px;
+  background: radial-gradient(ellipse at center, #0a0a1a 0%, #000 100%);
+  border: 1px solid #1a1a2e;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: default;
+}
+
+/* 背景装饰星尘 */
+#star-canvas::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.2), transparent),
+    radial-gradient(1px 1px at 50% 10%, rgba(255,255,255,0.25), transparent),
+    radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.15), transparent),
+    radial-gradient(1px 1px at 90% 40%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 15% 85%, rgba(255,255,255,0.2), transparent),
+    radial-gradient(1px 1px at 85% 15%, rgba(255,255,255,0.25), transparent),
+    radial-gradient(1px 1px at 45% 45%, rgba(255,255,255,0.1), transparent),
+    radial-gradient(1px 1px at 65% 35%, rgba(255,255,255,0.2), transparent),
+    radial-gradient(1px 1px at 25% 75%, rgba(255,255,255,0.15), transparent);
+  pointer-events: none;
+}
+
+.star-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--yellow, #e5c07b);
+  font-size: 0.9rem;
+  animation: loadingPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes loadingPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* ── 星星通用 ── */
+.star-dot {
+  position: absolute;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  /* 防止星星被选中 */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.star-dot:hover {
+  transform: scale(1.8) !important;
+  z-index: 10;
+}
+
+/* 贡献者 - 大星 */
+.star-contributor {
+  width: 10px;
+  height: 10px;
+  background: #e5c07b;
+  box-shadow:
+    0 0 6px 2px rgba(229, 192, 123, 0.8),
+    0 0 15px 4px rgba(229, 192, 123, 0.4);
+  animation: breatheBig 3s ease-in-out infinite;
+}
+
+/* 签到者 - 中星 */
+.star-commenter {
+  width: 6px;
+  height: 6px;
+  background: #61afef;
+  box-shadow:
+    0 0 4px 1px rgba(97, 175, 239, 0.7),
+    0 0 10px 3px rgba(97, 175, 239, 0.3);
+  animation: breatheMed 4s ease-in-out infinite;
+}
+
+/* Star 用户 - 小光点 */
+.star-stargazer {
+  width: 4px;
+  height: 4px;
+  background: #c678dd;
+  box-shadow:
+    0 0 3px 1px rgba(198, 120, 221, 0.6),
+    0 0 8px 2px rgba(198, 120, 221, 0.2);
+  animation: breatheSmall 5s ease-in-out infinite;
+}
+
+/* Fork 用户 - 小光点 */
+.star-forker {
+  width: 4px;
+  height: 4px;
+  background: #98c379;
+  box-shadow:
+    0 0 3px 1px rgba(152, 195, 121, 0.6),
+    0 0 8px 2px rgba(152, 195, 121, 0.2);
+  animation: breatheSmall 5s ease-in-out infinite;
+}
+
+@keyframes breatheBig {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+
+@keyframes breatheMed {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes breatheSmall {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.15); }
+}
+
+/* ── 气泡 ── */
+.star-bubble {
+  position: fixed;
+  z-index: 1000;
+  background: #1a1a2e;
+  border: 2px solid #333;
+  border-radius: 4px;
+  padding: 1rem;
+  max-width: 300px;
+  min-width: 200px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+  /* 像素风 */
+  image-rendering: pixelated;
+}
+
+.star-bubble.hidden {
+  display: none;
+}
+
+.bubble-close {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  cursor: pointer;
+  color: #555;
+  font-size: 0.8rem;
+}
+
+.bubble-close:hover {
+  color: #fff;
+}
+
+.bubble-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.bubble-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  border: 1px solid #333;
+  image-rendering: pixelated;
+}
+
+.bubble-name {
+  color: var(--yellow, #e5c07b);
+  font-size: 0.85rem;
+}
+
+.bubble-role {
+  color: #555;
+  font-size: 0.7rem;
+}
+
+.bubble-message {
+  color: #abb2bf;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  border-top: 1px solid #222;
+  padding-top: 0.5rem;
+  word-break: break-word;
+}
+
+.bubble-date {
+  color: #444;
+  font-size: 0.65rem;
+  margin-top: 0.4rem;
+  text-align: right;
+}
+
+/* ── 统计 ── */
+.starfield-stats {
+  text-align: center;
+  padding: 0.8rem 0;
+  color: #555;
+  font-size: 0.75rem;
+}
+
+.stat-sep {
+  margin: 0 0.3rem;
+  color: #333;
+}
+
+/* ── CTA ── */
+.starfield-cta {
+  text-align: center;
+  padding: 1rem 0 0;
+}
+
+.starfield-cta p {
+  color: #666;
+  font-size: 0.8rem;
+  margin-bottom: 0.6rem;
+}
+
+.cta-button {
+  display: inline-block;
+  padding: 0.5rem 1.2rem;
+  background: transparent;
+  border: 1px solid var(--yellow, #e5c07b);
+  color: var(--yellow, #e5c07b);
+  text-decoration: none;
+  font-size: 0.8rem;
+  border-radius: 2px;
+  transition: all 0.2s;
+  margin: 0 0.3rem;
+}
+
+.cta-button:hover {
+  background: var(--yellow, #e5c07b);
+  color: #000;
+}
+
+.cta-button-secondary {
+  border-color: #555;
+  color: #888;
+}
+
+.cta-button-secondary:hover {
+  border-color: #e5c07b;
+  background: transparent;
+  color: #e5c07b;
+}
+
+/* ── 手机适配 ── */
+@media (max-width: 768px) {
+  #star-canvas {
+    height: 300px;
+  }
+
+  .star-bubble {
+    left: 10px !important;
+    right: 10px !important;
+    max-width: none;
+  }
+}
+
 /* ══════════════════════════════════════
    Footer
    ══════════════════════════════════════ */
