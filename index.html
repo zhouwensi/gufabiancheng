@@ -1002,6 +1002,68 @@ footer a {
     <div class="hp-text pixel-font">12 / 100  — 全球手写代码率（预估）</div>
   </div>
 </section>
+   
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--                    星空修炼场                               -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section id="starfield" class="section">
+  <div class="container">
+    <h2 class="section-title pixel-font" style="color: var(--green);">
+      <span style="color: var(--yellow);">🌌</span> 星空修炼场
+    </h2>
+    <p class="starfield-subtitle">
+      每一颗星辰，都是一位古法修炼者的印记。点击星星，聆听他们的心声。
+    </p>
+    <p class="starfield-hint">
+      ★ 大星 = 代码贡献者 &nbsp;｜&nbsp; ✦ 中星 = 签到修炼者 &nbsp;｜&nbsp; · 光点 = Star / Fork
+    </p>
+
+    <!-- 星空画布 -->
+    <div id="star-canvas">
+      <div id="star-loading" class="star-loading">
+        <span class="pixel-font">✦ 正在召唤星辰...</span>
+      </div>
+    </div>
+
+    <!-- 统计 -->
+    <div class="starfield-stats">
+      <span id="stat-contributors">0 位贡献者</span>
+      <span class="stat-sep">·</span>
+      <span id="stat-comments">0 位签到者</span>
+      <span class="stat-sep">·</span>
+      <span id="stat-stargazers">0 次 Star</span>
+      <span class="stat-sep">·</span>
+      <span id="stat-forks">0 次 Fork</span>
+    </div>
+
+    <!-- 引导签到 -->
+    <div class="starfield-cta">
+      <p>想在星空中留下你的星辰？</p>
+      <a id="sign-in-link" href="https://github.com/zhouwensi/artisanalcoding/issues/17"
+         target="_blank" class="cta-button pixel-font">
+        ✨ 前往签到
+      </a>
+      <a href="https://github.com/zhouwensi/artisanalcoding"
+         target="_blank" class="cta-button cta-button-secondary pixel-font">
+        ⭐ 点亮 Star
+      </a>
+    </div>
+
+    <!-- 气泡 -->
+    <div id="star-bubble" class="star-bubble hidden">
+      <div class="bubble-close" id="bubble-close">✕</div>
+      <div class="bubble-header">
+        <img id="bubble-avatar" class="bubble-avatar" src="" alt="avatar">
+        <div>
+          <div id="bubble-name" class="bubble-name pixel-font"></div>
+          <div id="bubble-role" class="bubble-role"></div>
+        </div>
+      </div>
+      <div id="bubble-message" class="bubble-message"></div>
+      <div id="bubble-date" class="bubble-date"></div>
+    </div>
+  </div>
+</section>
 
 <!-- ★ 何为古法游戏编程 -->
 <section id="what">
@@ -1275,68 +1337,6 @@ footer a {
         <div class="hall-reason">一个人做了 4 年。代码、像素画、音乐、剧情全部手工。</div>
       </div>
 
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!--                    星空修炼场                               -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<section id="starfield" class="section">
-  <div class="container">
-    <h2 class="section-title pixel-font" style="color: var(--green);">
-      <span style="color: var(--yellow);">🌌</span> 星空修炼场
-    </h2>
-    <p class="starfield-subtitle">
-      每一颗星辰，都是一位古法修炼者的印记。点击星星，聆听他们的心声。
-    </p>
-    <p class="starfield-hint">
-      ★ 大星 = 代码贡献者 &nbsp;｜&nbsp; ✦ 中星 = 签到修炼者 &nbsp;｜&nbsp; · 光点 = Star / Fork
-    </p>
-
-    <!-- 星空画布 -->
-    <div id="star-canvas">
-      <div id="star-loading" class="star-loading">
-        <span class="pixel-font">✦ 正在召唤星辰...</span>
-      </div>
-    </div>
-
-    <!-- 统计 -->
-    <div class="starfield-stats">
-      <span id="stat-contributors">0 位贡献者</span>
-      <span class="stat-sep">·</span>
-      <span id="stat-comments">0 位签到者</span>
-      <span class="stat-sep">·</span>
-      <span id="stat-stargazers">0 次 Star</span>
-      <span class="stat-sep">·</span>
-      <span id="stat-forks">0 次 Fork</span>
-    </div>
-
-    <!-- 引导签到 -->
-    <div class="starfield-cta">
-      <p>想在星空中留下你的星辰？</p>
-      <a id="sign-in-link" href="https://github.com/zhouwensi/artisanalcoding/issues/17"
-         target="_blank" class="cta-button pixel-font">
-        ✨ 前往签到
-      </a>
-      <a href="https://github.com/zhouwensi/artisanalcoding"
-         target="_blank" class="cta-button cta-button-secondary pixel-font">
-        ⭐ 点亮 Star
-      </a>
-    </div>
-
-    <!-- 气泡 -->
-    <div id="star-bubble" class="star-bubble hidden">
-      <div class="bubble-close" id="bubble-close">✕</div>
-      <div class="bubble-header">
-        <img id="bubble-avatar" class="bubble-avatar" src="" alt="avatar">
-        <div>
-          <div id="bubble-name" class="bubble-name pixel-font"></div>
-          <div id="bubble-role" class="bubble-role"></div>
-        </div>
-      </div>
-      <div id="bubble-message" class="bubble-message"></div>
-      <div id="bubble-date" class="bubble-date"></div>
     </div>
   </div>
 </section>
