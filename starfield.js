@@ -8,13 +8,14 @@
   const CONFIG = {
     owner: 'zhouwensi',
     repo: 'artisanalcoding',
-    issueNumber: 17,          // ← 改成你实际的 Issue 编号
-    cacheMinutes: 10,        // 缓存时间（分钟）
-    maxStargazers: 30,       // 最多显示多少个 Stargazers（避免太多）
-    maxForkers: 20,          // 最多显示多少个 Forkers
+    issueNumber: 17,
+    cacheMinutes: 10,
+    maxStargazers: 30,
+    maxForkers: 20,
   };
 
-  const API_BASE = 'https://api.github.com';
+  // ★ 改动1：API 基础地址指向你的代理服务器
+  const API_BASE = 'http://154.198.42.133:3721';
   const CACHE_KEY = 'starfield_cache';
 
   // ══════════ DOM ══════════
@@ -23,7 +24,7 @@
   const bubble = document.getElementById('star-bubble');
   const bubbleClose = document.getElementById('bubble-close');
 
-  if (!canvas) return; // 页面上没有星空板块就跳过
+  if (!canvas) return;
 
   // ══════════ 工具函数 ══════════
   function getCache() {
@@ -56,15 +57,15 @@
 
   // ══════════ 拉取数据 ══════════
   async function fetchAllData() {
-    // 检查缓存
     const cached = getCache();
     if (cached) return cached;
 
+    // ★ 改动2：请求你的代理接口，而不是直接请求 GitHub
     const [contributors, comments, stargazers, forks] = await Promise.allSettled([
-      fetchJSON(`${API_BASE}/repos/${CONFIG.owner}/${CONFIG.repo}/contributors?per_page=100`),
-      fetchJSON(`${API_BASE}/repos/${CONFIG.owner}/${CONFIG.repo}/issues/${CONFIG.issueNumber}/comments?per_page=100`),
-      fetchJSON(`${API_BASE}/repos/${CONFIG.owner}/${CONFIG.repo}/stargazers?per_page=${CONFIG.maxStargazers}`),
-      fetchJSON(`${API_BASE}/repos/${CONFIG.owner}/${CONFIG.repo}/forks?per_page=${CONFIG.maxForkers}`),
+      fetchJSON(`${API_BASE}/api/contributors`),
+      fetchJSON(`${API_BASE}/api/checkins`),
+      fetchJSON(`${API_BASE}/api/stargazers`),
+      fetchJSON(`${API_BASE}/api/forks`),
     ]);
 
     const payload = {
@@ -85,7 +86,7 @@
 
     // 优先级 1：Contributors（大星）
     (data.contributors || []).forEach(c => {
-      if (!c.login || c.login.includes('[bot]')) return; // 过滤 bot
+      if (!c.login || c.login.includes('[bot]')) return;
       seen.add(c.login.toLowerCase());
       stars.push({
         type: 'contributor',
@@ -101,7 +102,7 @@
     (data.comments || []).forEach(c => {
       if (!c.user || !c.user.login) return;
       const login = c.user.login.toLowerCase();
-      if (seen.has(login)) return; // 已经是贡献者，跳过
+      if (seen.has(login)) return;
       seen.add(login);
       stars.push({
         type: 'commenter',
@@ -149,38 +150,29 @@
 
   // ══════════ 渲染星星 ══════════
   function renderStars(stars) {
-    // 清空
     loading.style.display = 'none';
 
-    const canvasRect = canvas.getBoundingClientRect();
     const W = canvas.offsetWidth;
     const H = canvas.offsetHeight;
-
-    // 预生成位置，避免重叠
     const positions = generatePositions(stars.length, W, H);
 
     stars.forEach((star, i) => {
       const dot = document.createElement('div');
       dot.className = `star-dot star-${star.type}`;
 
-      // 位置
       const pos = positions[i];
       dot.style.left = pos.x + 'px';
       dot.style.top = pos.y + 'px';
 
-      // 随机动画延迟，让呼吸效果错开
       dot.style.animationDelay = (Math.random() * 5).toFixed(2) + 's';
 
-      // 贡献者的星星根据提交次数变大
       if (star.type === 'contributor' && star.contributions) {
         const scale = Math.min(1 + star.contributions * 0.03, 2.5);
         dot.style.transform = `scale(${scale})`;
       }
 
-      // Tooltip
       dot.title = star.login;
 
-      // 点击
       dot.addEventListener('click', (e) => {
         e.stopPropagation();
         showBubble(star, e);
@@ -189,18 +181,16 @@
       canvas.appendChild(dot);
     });
 
-    // 如果没有星星，显示提示
     if (stars.length === 0) {
       loading.innerHTML = '<span class="pixel-font" style="color:#555;">暂无星辰… 成为第一位修炼者？</span>';
       loading.style.display = 'flex';
     }
   }
 
-  // 生成不重叠的随机位置
   function generatePositions(count, W, H) {
     const positions = [];
     const padding = 20;
-    const minDist = 18; // 最小间距
+    const minDist = 18;
 
     for (let i = 0; i < count; i++) {
       let x, y, attempts = 0;
@@ -232,16 +222,13 @@
       dateEl.textContent = '';
     }
 
-    // 定位气泡
     bubble.classList.remove('hidden');
 
-    // 计算位置：优先在点击位置附近
     const bw = bubble.offsetWidth;
     const bh = bubble.offsetHeight;
     let left = event.clientX + 15;
     let top = event.clientY - bh / 2;
 
-    // 防止溢出屏幕
     if (left + bw > window.innerWidth - 10) {
       left = event.clientX - bw - 15;
     }
@@ -258,7 +245,6 @@
     bubble.classList.add('hidden');
   }
 
-  // 关闭气泡
   bubbleClose.addEventListener('click', hideBubble);
   document.addEventListener('click', (e) => {
     if (!bubble.contains(e.target) && !e.target.classList.contains('star-dot')) {
@@ -289,7 +275,6 @@
     }
   }
 
-  // DOM ready 后初始化
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
