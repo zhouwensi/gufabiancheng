@@ -15,7 +15,7 @@
   };
 
   // ★ 改动1：API 基础地址指向你的代理服务器
-  const API_BASE = 'https://starfield-proxy.n11290mars.workers.dev';
+  const API_BASE = 'https://api.artisanalcoding.com';
   const CACHE_KEY = 'starfield_cache';
 
   // ══════════ DOM ══════════
