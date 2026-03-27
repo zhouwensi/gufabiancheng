@@ -8,7 +8,7 @@
   const CONFIG = {
     owner: 'zhouwensi',
     repo: 'artisanalcoding',
-    issueNumber: 1,          // ← 改成你实际的 Issue 编号
+    issueNumber: 17,          // ← 改成你实际的 Issue 编号
     cacheMinutes: 10,        // 缓存时间（分钟）
     maxStargazers: 30,       // 最多显示多少个 Stargazers（避免太多）
     maxForkers: 20,          // 最多显示多少个 Forkers
