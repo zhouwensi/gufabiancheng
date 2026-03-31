@@ -14,12 +14,11 @@
     maxForkers: 20,
   };
 
-  // 多个 API 基址：Worker 优先（Tunnel 常不可用）；缓存键升级用于丢弃旧版误缓存的空数据
+  // 仅使用 Cloudflare Worker：api.artisanalcoding.com 走 Tunnel，530 时无 CORS 头，浏览器会误报跨域失败，故不再请求该域。
   const API_BASE_CANDIDATES = [
     'https://starfield-proxy-api.n11290mars.workers.dev', // STARFIELD_WORKER_MANAGED
-    'https://api.artisanalcoding.com',
   ].filter(Boolean);
-  const CACHE_KEY = 'starfield_cache_v3';
+  const CACHE_KEY = 'starfield_cache_v4';
 
   // ══════════ DOM ══════════
   const canvas = document.getElementById('star-canvas');
