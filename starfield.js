@@ -14,12 +14,12 @@
     maxForkers: 20,
   };
 
-  // 多个 API 基址：优先自定义域；Tunnel/源站不可用时自动尝试 Cloudflare Worker（*.workers.dev）
+  // 多个 API 基址：Worker 优先（Tunnel 常不可用）；缓存键升级用于丢弃旧版误缓存的空数据
   const API_BASE_CANDIDATES = [
-    'https://api.artisanalcoding.com',
     'https://starfield-proxy-api.n11290mars.workers.dev', // STARFIELD_WORKER_MANAGED
+    'https://api.artisanalcoding.com',
   ].filter(Boolean);
-  const CACHE_KEY = 'starfield_cache';
+  const CACHE_KEY = 'starfield_cache_v3';
 
   // ══════════ DOM ══════════
   const canvas = document.getElementById('star-canvas');
@@ -52,9 +52,15 @@
     } catch { /* 忽略 */ }
   }
 
+  function asArray(v) {
+    return Array.isArray(v) ? v : [];
+  }
+
   async function fetchJSON(url) {
-    const res = await fetch(url);
+    const res = await fetch(url, { cache: 'no-store', mode: 'cors' });
+    const ct = res.headers.get('Content-Type') || '';
     if (!res.ok) throw new Error(`API ${res.status}`);
+    if (!ct.includes('json')) throw new Error('API non-json');
     return res.json();
   }
 
@@ -70,12 +76,17 @@
       const reason = [contributors, comments, stargazers, forks].find((r) => r.status === 'rejected');
       throw reason && reason.reason ? reason.reason : new Error('all endpoints failed');
     }
-    return {
-      contributors: contributors.status === 'fulfilled' ? contributors.value : [],
-      comments: comments.status === 'fulfilled' ? comments.value : [],
-      stargazers: stargazers.status === 'fulfilled' ? stargazers.value : [],
-      forks: forks.status === 'fulfilled' ? forks.value : [],
+    const payload = {
+      contributors: asArray(contributors.status === 'fulfilled' ? contributors.value : []),
+      comments: asArray(comments.status === 'fulfilled' ? comments.value : []),
+      stargazers: asArray(stargazers.status === 'fulfilled' ? stargazers.value : []),
+      forks: asArray(forks.status === 'fulfilled' ? forks.value : []),
     };
+    const malformed = [contributors, comments, stargazers, forks].some(
+      (r) => r.status === 'fulfilled' && r.value != null && !Array.isArray(r.value)
+    );
+    if (malformed) throw new Error('API response not JSON array');
+    return payload;
   }
 
   // ══════════ 拉取数据 ══════════
