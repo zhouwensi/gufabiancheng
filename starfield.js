@@ -14,8 +14,11 @@
     maxForkers: 20,
   };
 
-  // ★ 改动1：API 基础地址指向你的代理服务器
-  const API_BASE = 'https://api.artisanalcoding.com';
+  // 多个 API 基址：优先自定义域；Tunnel/源站不可用时自动尝试 Cloudflare Worker（*.workers.dev）
+  const API_BASE_CANDIDATES = [
+    'https://api.artisanalcoding.com',
+    'https://starfield-proxy-api.n11290mars.workers.dev', // STARFIELD_WORKER_MANAGED
+  ].filter(Boolean);
   const CACHE_KEY = 'starfield_cache';
 
   // ══════════ DOM ══════════
@@ -55,28 +58,42 @@
     return res.json();
   }
 
-  // ══════════ 拉取数据 ══════════
-  async function fetchAllData() {
-    const cached = getCache();
-    if (cached) return cached;
-
-    // ★ 改动2：请求你的代理接口，而不是直接请求 GitHub
+  async function fetchPayloadFromBase(API_BASE) {
     const [contributors, comments, stargazers, forks] = await Promise.allSettled([
       fetchJSON(`${API_BASE}/api/contributors`),
       fetchJSON(`${API_BASE}/api/checkins`),
       fetchJSON(`${API_BASE}/api/stargazers`),
       fetchJSON(`${API_BASE}/api/forks`),
     ]);
-
-    const payload = {
+    const allRejected = [contributors, comments, stargazers, forks].every((r) => r.status === 'rejected');
+    if (allRejected) {
+      const reason = [contributors, comments, stargazers, forks].find((r) => r.status === 'rejected');
+      throw reason && reason.reason ? reason.reason : new Error('all endpoints failed');
+    }
+    return {
       contributors: contributors.status === 'fulfilled' ? contributors.value : [],
       comments: comments.status === 'fulfilled' ? comments.value : [],
       stargazers: stargazers.status === 'fulfilled' ? stargazers.value : [],
       forks: forks.status === 'fulfilled' ? forks.value : [],
     };
+  }
 
-    setCache(payload);
-    return payload;
+  // ══════════ 拉取数据 ══════════
+  async function fetchAllData() {
+    const cached = getCache();
+    if (cached) return cached;
+
+    let lastErr;
+    for (const base of API_BASE_CANDIDATES) {
+      try {
+        const payload = await fetchPayloadFromBase(base);
+        setCache(payload);
+        return payload;
+      } catch (e) {
+        lastErr = e;
+      }
+    }
+    throw lastErr || new Error('starfield API unavailable');
   }
 
   // ══════════ 去重 & 构建星星数据 ══════════
